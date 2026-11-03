@@ -100,7 +100,7 @@ alt-shift-k = ['join-with up', 'mode main']
 alt-shift-l = ['join-with right', 'mode main']
 
 # ── App rules ────────────────────────────────────────────────────────
-# terminal and editor on 1, browser on 2, chat on 3; small utilities float
+# terminal and editor on 1, browser on 2; small utilities float
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
 run = 'move-node-to-workspace 1'
@@ -119,8 +119,4 @@ run = 'layout floating'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.systempreferences'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.raycast.macos'
 run = 'layout floating'

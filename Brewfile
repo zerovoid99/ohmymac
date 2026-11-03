@@ -31,12 +31,11 @@ brew "neovim"
 brew "tmux"
 brew "jq"
 
-# desktop: tiling window manager, focused-window border, launcher
+# desktop: tiling window manager, focused-window border
 tap "nikitabobko/tap"
 tap "FelixKratz/formulae"
 cask "aerospace"
 brew "borders"
-cask "raycast"
 
 # font
 cask "font-jetbrains-mono-nerd-font"
