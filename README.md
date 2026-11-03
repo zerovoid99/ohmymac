@@ -1,6 +1,6 @@
 # ohmymac
 
-macOS terminal dotfiles: **Ghostty + Oh My Zsh + Starship + tmux + Neovim (LazyVim)**, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
+macOS dev environment: **Ghostty + Oh My Zsh + Starship + tmux + Neovim (LazyVim) + AeroSpace tiling**, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
 
 ## Install (fresh Mac)
 
@@ -26,6 +26,9 @@ Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-ru
 | `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
 | `lazygit/`   | `~/Library/Application Support/lazygit/config.yml`                  |
 | `ssh/`       | `~/.ssh/config` (keys themselves are never in the repo)              |
+| `aerospace/` | `~/.config/aerospace/aerospace.toml` (tiling window manager)        |
+| `borders/`   | `~/.config/borders/bordersrc` (focused-window border)               |
+| `macos/`     | `defaults.sh`, run by the installer (not linked)                     |
 
 Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
 
@@ -45,6 +48,8 @@ GitHub is always reached over SSH: `https://github.com/...` URLs are rewritten t
 
 **Neovim** — `v file` · `Space` leader, `Space e` file tree · `Space f f` find file · `Space s g` grep · `Space g g` lazygit · `Space l` plugin manager
 
-**tmux** — prefix is `Ctrl+Space` · `tm` attach/create session for this folder · `prefix |` / `prefix -` split · `Ctrl+hjkl` move between panes (also inside Neovim) · `prefix m` zoom · `Alt+1..5` switch window · `prefix I` install plugins
+**tmux** — prefix is `Ctrl+Space` · `tm` attach/create session for this folder · `prefix |` / `prefix -` split · `Ctrl+hjkl` move between panes (also inside Neovim) · `prefix m` zoom · `prefix 1..9` / `prefix n` / `prefix p` switch window · `prefix I` install plugins
+
+**AeroSpace** (Alt = Option) — `Alt+hjkl` focus · `Alt+Shift+hjkl` move window · `Alt+1..9` workspace · `Alt+Shift+1..9` send window there · `Alt+Tab` previous workspace · `Alt+/` tiles · `Alt+,` accordion · `Alt+f` fullscreen · `Alt+Shift+f` float · `Alt+-` / `Alt+=` resize · `Alt+Enter` new Ghostty · `Alt+Shift+;` then `r` reset layout
 
 **Misc** — `killport 3000` · `ports` · `ip` · `reload` · `zshrc` · `ghostty-config`

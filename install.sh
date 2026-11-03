@@ -68,6 +68,8 @@ link "$DOTFILES/nvim"                                "$HOME/.config/nvim"
 link "$DOTFILES/tmux/tmux.conf"                      "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES/lazygit/config.yml"                  "$LAZYGIT_DIR/config.yml"
 link "$DOTFILES/ssh/config"                          "$HOME/.ssh/config"
+link "$DOTFILES/aerospace/aerospace.toml"            "$HOME/.config/aerospace/aerospace.toml"
+link "$DOTFILES/borders/bordersrc"                   "$HOME/.config/borders/bordersrc"
 chmod 700 "$HOME/.ssh"; chmod 600 "$DOTFILES/ssh/config"
 
 # ---------- 5. tmux plugins (TPM) ----------
@@ -77,7 +79,11 @@ if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
 fi
 "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" >/dev/null && ok "tmux plugins installed"
 
-# ---------- 6. Finishing touches ----------
+# ---------- 6. macOS defaults ----------
+step "macOS defaults"
+"$DOTFILES/macos/defaults.sh" >/dev/null && ok "defaults applied"
+
+# ---------- 7. Finishing touches ----------
 step "Finishing touches"
 bat cache --build >/dev/null && ok "bat theme cache rebuilt"
 touch "$HOME/.hushlogin" && ok "'Last login' banner hidden"
@@ -101,6 +107,10 @@ fi
 if [ -d /Applications/Ghostty.app ]; then
   /Applications/Ghostty.app/Contents/MacOS/ghostty +validate-config >/dev/null 2>&1 \
     && ok "ghostty config valid" || warn "ghostty config has warnings, run: ghostty +validate-config"
+fi
+
+if [ -d /Applications/AeroSpace.app ]; then
+  open -a AeroSpace && ok "AeroSpace started (grant Accessibility access when asked)"
 fi
 
 printf "\n${c_green}Done!${c_off} Quit Ghostty (Cmd+Q) and reopen it, or run: ${c_dim}exec zsh${c_off}\n\n"
