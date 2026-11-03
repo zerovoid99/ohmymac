@@ -44,7 +44,7 @@ GitHub is always reached over SSH: `https://github.com/...` URLs are rewritten t
 
 **lazygit** — `C` conventional commit (type → scope → summary) · `Ctrl+O` open repo on GitHub · `e` edit file in nvim · `?` all keys
 
-**Ghostty** — `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
+**Ghostty** — `Cmd+T` / `Cmd+N` new window (tiled by AeroSpace; native tabs are disabled because AeroSpace treats each tab as a window) · `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
 
 **Neovim** — `v file` · `Space` leader, `Space e` file tree · `Space f f` find file · `Space s g` grep · `Space g g` lazygit · `Space l` plugin manager
 

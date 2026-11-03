@@ -20,12 +20,19 @@ cursor-style-blink = true
 window-padding-x = 14
 window-padding-y = 10
 window-padding-balance = true
-macos-titlebar-style = tabs
+# no title bar: tabs are still reachable with Cmd+1..9 and Cmd+Shift+[ / ]
+macos-titlebar-style = hidden
 window-save-state = always
 mouse-hide-while-typing = true
 copy-on-select = clipboard
 shell-integration = zsh
 shell-integration-features = cursor,sudo,title
+
+# --- Keybinds: no native tabs ---
+# macOS tabs are separate windows under the hood, so AeroSpace tiles each tab as its
+# own slot and the visible one jumps around. Cmd+T opens a tiled window instead;
+# use tmux windows (prefix + c) when you want tabs.
+keybind = cmd+t=new_window
 
 # --- Keybinds: tmux-like splits ---
 keybind = cmd+d=new_split:right
