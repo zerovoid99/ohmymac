@@ -2,7 +2,7 @@
 # JankyBorders config (managed by ~/Code/ohmymac). AeroSpace launches borders with the
 # same values; this file is for running `borders` on its own.
 options=(
-  style=round
+  style=square
   width=5.0
   hidpi=on
   active_color=0xffcba6f7

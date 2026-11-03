@@ -5,7 +5,7 @@
 # --- Window size (columns x rows) & transparency ---
 window-width = 133
 window-height = 40
-background-opacity = 0.65
+background-opacity = 0.85
 background-blur = true
 
 # --- Font & theme ---
@@ -20,8 +20,9 @@ cursor-style-blink = true
 window-padding-x = 14
 window-padding-y = 10
 window-padding-balance = true
-# no title bar: tabs are still reachable with Cmd+1..9 and Cmd+Shift+[ / ]
-macos-titlebar-style = hidden
+# no macOS window decoration: no title bar, no traffic lights, square corners.
+# AeroSpace handles sizing/moving, so mouse resize is not needed.
+window-decoration = none
 window-save-state = always
 mouse-hide-while-typing = true
 copy-on-select = clipboard

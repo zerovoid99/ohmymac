@@ -9,7 +9,7 @@ persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 after-login-command = []
 after-startup-command = [
   # focused-window border in Catppuccin mauve
-  'exec-and-forget borders active_color=0xffcba6f7 inactive_color=0xff45475a width=5.0',
+  'exec-and-forget borders style=square active_color=0xffcba6f7 inactive_color=0xff45475a width=5.0',
 ]
 
 enable-normalization-flatten-containers = true

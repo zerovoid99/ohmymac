@@ -28,7 +28,7 @@ Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-ru
 | `ssh/`       | `~/.ssh/config` (keys themselves are never in the repo)              |
 | `aerospace/` | `~/.config/aerospace/aerospace.toml` (tiling window manager)        |
 | `borders/`   | `~/.config/borders/bordersrc` (focused-window border)               |
-| `macos/`     | `defaults.sh`, run by the installer (not linked)                     |
+| `macos/`     | `defaults.sh` and `wallpaper.sh`, run by the installer (not linked)  |
 
 Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
 

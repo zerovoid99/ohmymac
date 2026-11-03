@@ -82,6 +82,7 @@ fi
 # ---------- 6. macOS defaults ----------
 step "macOS defaults"
 "$DOTFILES/macos/defaults.sh" >/dev/null && ok "defaults applied"
+"$DOTFILES/macos/wallpaper.sh" >/dev/null && ok "catppuccin wallpaper set"
 
 # ---------- 7. Finishing touches ----------
 step "Finishing touches"
