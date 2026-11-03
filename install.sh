@@ -64,8 +64,16 @@ link "$DOTFILES/bat/config"                          "$HOME/.config/bat/config"
 link "$DOTFILES/bat/themes/Catppuccin Mocha.tmTheme" "$HOME/.config/bat/themes/Catppuccin Mocha.tmTheme"
 link "$DOTFILES/ghostty/config.ghostty"              "$GHOSTTY_DIR/config.ghostty"
 link "$DOTFILES/nvim"                                "$HOME/.config/nvim"
+link "$DOTFILES/tmux/tmux.conf"                      "$HOME/.config/tmux/tmux.conf"
 
-# ---------- 5. Finishing touches ----------
+# ---------- 5. tmux plugins (TPM) ----------
+step "tmux plugins"
+if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
+  git clone -q https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
+fi
+"$HOME/.config/tmux/plugins/tpm/bin/install_plugins" >/dev/null && ok "tmux plugins installed"
+
+# ---------- 6. Finishing touches ----------
 step "Finishing touches"
 bat cache --build >/dev/null && ok "bat theme cache rebuilt"
 touch "$HOME/.hushlogin" && ok "'Last login' banner hidden"

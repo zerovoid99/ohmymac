@@ -1,6 +1,6 @@
 # ohmymac
 
-macOS terminal dotfiles: **Ghostty + Oh My Zsh + Starship + Neovim (LazyVim)**, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
+macOS terminal dotfiles: **Ghostty + Oh My Zsh + Starship + tmux + Neovim (LazyVim)**, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
 
 ## Install (fresh Mac)
 
@@ -23,6 +23,7 @@ Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-ru
 | `git/`       | `~/.gitconfig` (identity lives in `~/.gitconfig.local`, not committed) |
 | `bat/`       | `~/.config/bat/`                                                    |
 | `nvim/`      | `~/.config/nvim` (LazyVim + Catppuccin)                             |
+| `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
 
 Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
 
@@ -37,5 +38,7 @@ Everything is symlinked, so editing a file here takes effect immediately. Commit
 **Ghostty** — `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
 
 **Neovim** — `v file` · `Space` leader, `Space e` file tree · `Space f f` find file · `Space s g` grep · `Space g g` lazygit · `Space l` plugin manager
+
+**tmux** — prefix is `Ctrl+Space` · `tm` attach/create session for this folder · `prefix |` / `prefix -` split · `Ctrl+hjkl` move between panes (also inside Neovim) · `prefix m` zoom · `Alt+1..5` switch window · `prefix I` install plugins
 
 **Misc** — `killport 3000` · `ports` · `ip` · `reload` · `zshrc` · `ghostty-config`

@@ -28,6 +28,7 @@ brew "gh"
 # misc
 brew "fastfetch"
 brew "neovim"
+brew "tmux"
 brew "jq"
 
 # font

@@ -96,6 +96,9 @@ command -v duf     >/dev/null && alias df="duf"
 command -v btop    >/dev/null && alias top="btop"
 command -v lazygit >/dev/null && alias lg="lazygit"
 command -v nvim    >/dev/null && alias vim="nvim" vi="nvim" v="nvim"
+alias ta="tmux attach -t"
+alias tl="tmux ls"
+alias tk="tmux kill-session -t"
 
 # --- Aliases: navigation & misc ---
 alias ..="cd .."
@@ -144,6 +147,16 @@ killport(){ lsof -ti tcp:"$1" | xargs kill -9 2>/dev/null && echo "✓ port $1 k
 fcd()     { local d; d=$(fd --type d --hidden --exclude .git | fzf --preview 'eza --tree --level=2 --icons --color=always {}') && cd "$d"; }   # fuzzy cd
 fe()      { local f; f=$(fzf --preview 'bat --color=always --style=numbers {}') && [ -n "$f" ] && $EDITOR "$f"; }                            # fuzzy edit
 fkill()   { local pid; pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}'); [ -n "$pid" ] && echo "$pid" | xargs kill -9; }                    # fuzzy kill
+# tm [name]: attach to or create a session (default: current folder name); switches instead when already inside tmux
+tm() {
+  local n=${1:-$(basename "$PWD")}
+  if [[ -n $TMUX ]]; then
+    tmux has-session -t "=$n" 2>/dev/null || tmux new-session -d -s "$n" -c "$PWD"
+    tmux switch-client -t "=$n"
+  else
+    tmux new-session -A -s "$n" -c "$PWD"
+  fi
+}
 gfb()     { git branch --all | grep -v HEAD | fzf --preview 'git log --oneline --graph --color=always {1}' | sed 's/.* //;s#remotes/origin/##' | xargs git switch; }  # fuzzy git branch
 
 # --- Syntax highlighting (MUST be sourced last) ---
@@ -151,4 +164,4 @@ gfb()     { git branch --all | grep -v HEAD | fzf --preview 'git log --oneline -
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # --- Splash ---
-[[ -o interactive ]] && command -v fastfetch >/dev/null && fastfetch
+[[ -o interactive && -z $TMUX ]] && command -v fastfetch >/dev/null && fastfetch   # skip inside tmux panes
