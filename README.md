@@ -25,8 +25,11 @@ Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-ru
 | `nvim/`      | `~/.config/nvim` (LazyVim + Catppuccin)                             |
 | `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
 | `lazygit/`   | `~/Library/Application Support/lazygit/config.yml`                  |
+| `ssh/`       | `~/.ssh/config` (keys themselves are never in the repo)              |
 
 Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
+
+GitHub is always reached over SSH: `https://github.com/...` URLs are rewritten to `git@github.com:` by git, and `gh` clones over SSH too. Put your key at `~/.ssh/id_ed25519` and add the public key to GitHub.
 
 ## Cheat sheet
 

@@ -67,6 +67,8 @@ link "$DOTFILES/ghostty/config.ghostty"              "$GHOSTTY_DIR/config.ghostt
 link "$DOTFILES/nvim"                                "$HOME/.config/nvim"
 link "$DOTFILES/tmux/tmux.conf"                      "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES/lazygit/config.yml"                  "$LAZYGIT_DIR/config.yml"
+link "$DOTFILES/ssh/config"                          "$HOME/.ssh/config"
+chmod 700 "$HOME/.ssh"; chmod 600 "$DOTFILES/ssh/config"
 
 # ---------- 5. tmux plugins (TPM) ----------
 step "tmux plugins"
@@ -82,6 +84,7 @@ touch "$HOME/.hushlogin" && ok "'Last login' banner hidden"
 chmod go-w /opt/homebrew/share 2>/dev/null || true
 chmod -R go-w /opt/homebrew/share/zsh 2>/dev/null || true
 rm -f "$HOME"/.zcompdump* && ok "zsh completion cache reset"
+command -v gh >/dev/null && gh config set git_protocol ssh && ok "gh uses ssh"
 
 if [ ! -f "$HOME/.gitconfig.local" ]; then
   if [ -t 0 ]; then

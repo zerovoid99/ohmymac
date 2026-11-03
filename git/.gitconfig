@@ -16,6 +16,17 @@
 	defaultBranch = main
 [pull]
 	rebase = true
+[url "git@github.com:"]
+	# use SSH for every GitHub URL, so https clones/remotes never ask for credentials
+	insteadOf = https://github.com/
+	insteadOf = gh:
+[push]
+	autoSetupRemote = true
+	default = current
+[fetch]
+	prune = true
+[rebase]
+	autoStash = true
 [include]
 	# user identity (name/email) and other personal bits; not committed
 	path = ~/.gitconfig.local
