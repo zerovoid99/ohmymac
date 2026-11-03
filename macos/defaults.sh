@@ -22,6 +22,10 @@ defaults write com.apple.dock tilesize -int 42
 defaults write com.apple.dock show-recents -bool false
 defaults write com.apple.dock minimize-to-application -bool true
 
+# ---- Menu bar: auto-hide (edge-to-edge windows with AeroSpace) ----
+defaults write NSGlobalDomain _HIHideMenuBar -bool true
+defaults write NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool false
+
 # ---- Mission Control / Spaces (recommended for AeroSpace) ----
 defaults write com.apple.dock mru-spaces -bool false          # don't rearrange spaces by recent use
 defaults write com.apple.dock expose-group-apps -bool true    # group windows by app
