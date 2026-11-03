@@ -1,0 +1,156 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+# Pill/capsule style (alternative). To use: cp starship.pills.toml starship.toml
+# Every module draws its own colored capsule, so nothing is
+# left dangling when a module is hidden (e.g. outside a git repo).
+
+palette = "catppuccin_mocha"
+add_newline = false   # the blank line between commands is handled in .zshrc
+command_timeout = 1000
+
+format = """
+$os\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$nodejs\
+$bun\
+$python\
+$golang\
+$rust\
+$php\
+$java\
+$docker_context\
+$package
+$character"""
+
+# clock & duration on the right of the input line (zsh RPROMPT, width-safe)
+right_format = "$cmd_duration$time"
+
+# ── OS ───────────────────────────────────────────────────────────────
+[os]
+disabled = false
+format = "[](fg:mauve)[$symbol](bg:mauve fg:crust)[](fg:mauve) "
+[os.symbols]
+Macos = " "
+
+# ── Directory ────────────────────────────────────────────────────────
+[directory]
+format = "[](fg:blue)[$read_only$path](bg:blue fg:crust bold)[](fg:blue) "
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+read_only = " "
+read_only_style = "bg:blue fg:crust"
+[directory.substitutions]
+"~" = " "
+"Code" = " Code"
+"Projects" = " Projects"
+"Documents" = " Documents"
+"Downloads" = " Downloads"
+"Desktop" = " Desktop"
+
+# ── Git ──────────────────────────────────────────────────────────────
+[git_branch]
+symbol = " "
+format = "[](fg:peach)[$symbol$branch](bg:peach fg:crust bold)"
+
+[git_status]
+format = "[( $all_status$ahead_behind)](bg:peach fg:crust)[](fg:peach) "
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?${count}"
+modified = "!${count}"
+staged = "+${count}"
+stashed = "≡"
+deleted = "✘${count}"
+renamed = "»${count}"
+conflicted = "=${count}"
+
+[git_state]
+format = "[](fg:red)[$state( $progress_current/$progress_total)](bg:red fg:crust)[](fg:red) "
+
+# ── Languages / runtimes ─────────────────────────────────────────────────
+[nodejs]
+symbol = " "
+format = "[](fg:green)[$symbol($version)](bg:green fg:crust)[](fg:green) "
+detect_files = ["package.json", ".node-version", ".nvmrc"]
+detect_folders = ["node_modules"]
+
+[bun]
+symbol = " bun "
+format = "[](fg:rosewater)[$symbol($version)](bg:rosewater fg:crust)[](fg:rosewater) "
+
+[python]
+symbol = " "
+format = "[](fg:yellow)[$symbol($version)( $virtualenv)](bg:yellow fg:crust)[](fg:yellow) "
+
+[golang]
+symbol = " "
+format = "[](fg:sky)[$symbol($version)](bg:sky fg:crust)[](fg:sky) "
+
+[rust]
+symbol = " "
+format = "[](fg:maroon)[$symbol($version)](bg:maroon fg:crust)[](fg:maroon) "
+
+[php]
+symbol = " "
+format = "[](fg:lavender)[$symbol($version)](bg:lavender fg:crust)[](fg:lavender) "
+
+[java]
+symbol = " "
+format = "[](fg:flamingo)[$symbol($version)](bg:flamingo fg:crust)[](fg:flamingo) "
+
+[docker_context]
+symbol = " "
+format = "[](fg:sapphire)[$symbol$context](bg:sapphire fg:crust)[](fg:sapphire) "
+only_with_files = true
+
+[package]
+symbol = " "
+format = "[](fg:surface1)[$symbol$version](bg:surface1 fg:subtext0)[](fg:surface1) "
+
+# ── Right side: duration & clock ──────────────────────────────────────────────
+[cmd_duration]
+min_time = 2000
+format = "[](fg:yellow)[ $duration](bg:yellow fg:crust)[](fg:yellow) "
+
+[time]
+disabled = false
+time_format = "%H:%M"
+format = "[](fg:surface0)[ $time](bg:surface0 fg:subtext1)[](fg:surface0)"
+
+# ── Line 2: prompt character ──────────────────────────────────────────────────────────
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold mauve)"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"

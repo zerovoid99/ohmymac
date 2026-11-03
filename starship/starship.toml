@@ -1,0 +1,171 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+# Clean style: colored icons and text, no backgrounds.
+# The capsule/pill variant lives in starship.pills.toml (copy it over this file to switch).
+
+palette = "catppuccin_mocha"
+add_newline = false   # the blank line between commands is handled in .zshrc
+command_timeout = 1000
+
+format = """
+$os\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$nodejs\
+$bun\
+$python\
+$golang\
+$rust\
+$php\
+$java\
+$docker_context\
+$package
+$character"""
+
+# clock & duration on the right of the input line (zsh RPROMPT, width-safe)
+right_format = "$cmd_duration$time"
+
+# ── OS ───────────────────────────────────────────────────────────────
+[os]
+disabled = false
+style = "mauve"
+format = "[$symbol]($style) "
+[os.symbols]
+Macos = ""
+
+# ── Directory ────────────────────────────────────────────────────────
+[directory]
+style = "bold blue"
+read_only_style = "red"
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+read_only = " "
+[directory.substitutions]
+"~" = " ~"
+"Code" = " Code"
+"Projects" = " Projects"
+"Documents" = " Documents"
+"Downloads" = " Downloads"
+"Desktop" = " Desktop"
+
+# ── Git ──────────────────────────────────────────────────────────────
+[git_branch]
+symbol = " "
+style = "bold peach"
+format = "[$symbol$branch]($style)"
+
+[git_status]
+style = "red"
+format = "[( $all_status$ahead_behind)]($style) "
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?${count}"
+modified = "!${count}"
+staged = "+${count}"
+stashed = "≡"
+deleted = "✘${count}"
+renamed = "»${count}"
+conflicted = "=${count}"
+
+[git_state]
+style = "bold red"
+format = "[\\($state( $progress_current/$progress_total)\\)]($style) "
+
+# ── Languages / runtimes ─────────────────────────────────────────────
+[nodejs]
+symbol = " "
+style = "green"
+format = "[$symbol($version)]($style) "
+detect_files = ["package.json", ".node-version", ".nvmrc"]
+detect_folders = ["node_modules"]
+
+[bun]
+symbol = " bun "
+style = "rosewater"
+format = "[$symbol($version)]($style) "
+
+[python]
+symbol = " "
+style = "yellow"
+format = "[$symbol($version)( $virtualenv)]($style) "
+
+[golang]
+symbol = " "
+style = "sky"
+format = "[$symbol($version)]($style) "
+
+[rust]
+symbol = " "
+style = "maroon"
+format = "[$symbol($version)]($style) "
+
+[php]
+symbol = " "
+style = "lavender"
+format = "[$symbol($version)]($style) "
+
+[java]
+symbol = " "
+style = "flamingo"
+format = "[$symbol($version)]($style) "
+
+[docker_context]
+symbol = " "
+style = "sapphire"
+format = "[$symbol$context]($style) "
+only_with_files = true
+
+[package]
+symbol = " "
+style = "overlay1"
+format = "[$symbol$version]($style) "
+
+# ── Right side: duration & clock ─────────────────────────────────────
+[cmd_duration]
+min_time = 2000
+style = "yellow"
+format = "[ $duration]($style) "
+
+[time]
+disabled = false
+style = "overlay1"
+time_format = "%H:%M"
+format = "[ $time]($style)"
+
+# ── Line 2: prompt character ─────────────────────────────────────────
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold mauve)"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"

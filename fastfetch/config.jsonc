@@ -1,0 +1,31 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "builtin",
+    "source": "macos",
+    "padding": { "top": 1, "left": 1, "right": 4 }
+  },
+  "display": {
+    "separator": "  ",
+    "key": { "width": 18 }
+  },
+  "modules": [
+    { "type": "title",    "format": "{#1;35}\uf179  {user-name}{#} {#90}in{#} {#1;34}{host-name}{#}" },
+    { "type": "separator", "string": "─" },
+    { "type": "os",       "key": "  OS",       "keyColor": "magenta", "format": "{name} {version} {arch}" },
+    { "type": "host",     "key": "  Host",     "keyColor": "magenta" },
+    { "type": "kernel",   "key": "\uf013  Kernel",   "keyColor": "magenta" },
+    { "type": "uptime",   "key": "  Uptime",   "keyColor": "magenta" },
+    { "type": "packages", "key": "  Packages", "keyColor": "blue" },
+    { "type": "shell",    "key": "  Shell",    "keyColor": "blue" },
+    { "type": "terminal", "key": "  Terminal", "keyColor": "blue" },
+    { "type": "cpu",      "key": "  CPU",      "keyColor": "green", "format": "{name}" },
+    { "type": "gpu",      "key": "\uf26c  GPU",      "keyColor": "green", "format": "{name}" },
+    { "type": "memory",   "key": "  Memory",   "keyColor": "green", "format": "{used} / {total} ({percentage})" },
+    { "type": "disk",     "key": "  Disk",     "keyColor": "green", "folders": "/", "format": "{size-used} / {size-total} ({size-percentage})" },
+    { "type": "battery",  "key": "  Battery",  "keyColor": "yellow", "format": "{capacity} ({status})" },
+    { "type": "localip",  "key": "  IP",       "keyColor": "yellow", "showIpv4": true, "showPrefixLen": false, "compact": true },
+    "break",
+    { "type": "colors",   "symbol": "circle", "paddingLeft": 3 }
+  ]
+}

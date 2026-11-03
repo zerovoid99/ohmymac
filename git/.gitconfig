@@ -1,0 +1,21 @@
+[core]
+	editor = nvim
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
+	syntax-theme = Catppuccin Mocha
+[merge]
+	conflictstyle = zdiff3
+[diff]
+	colorMoved = default
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[include]
+	# user identity (name/email) and other personal bits; not committed
+	path = ~/.gitconfig.local
