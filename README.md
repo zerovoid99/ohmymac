@@ -24,6 +24,7 @@ Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-ru
 | `bat/`       | `~/.config/bat/`                                                    |
 | `nvim/`      | `~/.config/nvim` (LazyVim + Catppuccin)                             |
 | `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
+| `lazygit/`   | `~/Library/Application Support/lazygit/config.yml`                  |
 
 Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
 
@@ -34,6 +35,8 @@ Everything is symlinked, so editing a file here takes effect immediately. Commit
 **fzf** — `Ctrl+T` find file · `Ctrl+R` search history · `Alt+C` jump to folder
 
 **Git** — `gs` status · `gl` log graph · `gd` diff · `gfb` pick a branch · `lg` lazygit
+
+**lazygit** — `C` conventional commit (type → scope → summary) · `Ctrl+O` open repo on GitHub · `e` edit file in nvim · `?` all keys
 
 **Ghostty** — `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
 

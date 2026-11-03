@@ -7,6 +7,7 @@ set -euo pipefail
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 GHOSTTY_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
+LAZYGIT_DIR="$HOME/Library/Application Support/lazygit"
 
 c_blue='\033[1;34m'; c_green='\033[1;32m'; c_yellow='\033[1;33m'; c_dim='\033[2m'; c_off='\033[0m'
 step() { printf "\n${c_blue}==>${c_off} %s\n" "$*"; }
@@ -65,6 +66,7 @@ link "$DOTFILES/bat/themes/Catppuccin Mocha.tmTheme" "$HOME/.config/bat/themes/C
 link "$DOTFILES/ghostty/config.ghostty"              "$GHOSTTY_DIR/config.ghostty"
 link "$DOTFILES/nvim"                                "$HOME/.config/nvim"
 link "$DOTFILES/tmux/tmux.conf"                      "$HOME/.config/tmux/tmux.conf"
+link "$DOTFILES/lazygit/config.yml"                  "$LAZYGIT_DIR/config.yml"
 
 # ---------- 5. tmux plugins (TPM) ----------
 step "tmux plugins"

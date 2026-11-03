@@ -1,0 +1,104 @@
+# lazygit config (managed by ~/Code/ohmymac)
+# Docs: https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+
+gui:
+  nerdFontsVersion: "3"
+  border: rounded
+  showFileTree: true
+  showRandomTip: false
+  showCommandLog: false
+  scrollPastBottom: false
+  sidePanelWidth: 0.3
+  mainPanelSplitMode: flexible
+  theme:
+    # Catppuccin Mocha
+    activeBorderColor: ["#cba6f7", "bold"]
+    inactiveBorderColor: ["#a6adc8"]
+    optionsTextColor: ["#89b4fa"]
+    selectedLineBgColor: ["#313244"]
+    cherryPickedCommitBgColor: ["#45475a"]
+    cherryPickedCommitFgColor: ["#cba6f7"]
+    unstagedChangesColor: ["#f38ba8"]
+    defaultFgColor: ["#cdd6f4"]
+    searchingActiveBorderColor: ["#f9e2af"]
+    authorColors:
+      "*": "#b4befe"
+git:
+  diffRenderers:
+    - colorArg: always
+      command: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
+  commit:
+    signOff: false
+  merging:
+    args: ""
+  autoFetch: true
+  autoRefresh: true
+  branchLogCmd: git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
+  parseEmoji: true
+os:
+  editPreset: nvim
+update:
+  method: never # Homebrew handles updates
+disableStartupPopups: true
+promptToReturnFromSubprocess: false
+customCommands:
+  # Conventional commit: pick a type, optional scope, then write the message
+  - key: "C"
+    context: "files"
+    description: "Conventional commit"
+    prompts:
+      - type: "menu"
+        key: "Type"
+        title: "Commit type"
+        options:
+          - name: "feat"
+            description: "a new feature"
+            value: "feat"
+          - name: "fix"
+            description: "a bug fix"
+            value: "fix"
+          - name: "chore"
+            description: "maintenance, no production code change"
+            value: "chore"
+          - name: "docs"
+            description: "documentation only"
+            value: "docs"
+          - name: "refactor"
+            description: "neither fixes a bug nor adds a feature"
+            value: "refactor"
+          - name: "style"
+            description: "formatting, no code change"
+            value: "style"
+          - name: "perf"
+            description: "performance improvement"
+            value: "perf"
+          - name: "test"
+            description: "adding or fixing tests"
+            value: "test"
+          - name: "build"
+            description: "build system or dependencies"
+            value: "build"
+          - name: "ci"
+            description: "CI configuration"
+            value: "ci"
+      - type: "input"
+        key: "Scope"
+        title: "Scope (optional, leave empty to skip)"
+        initialValue: ""
+      - type: "input"
+        key: "Message"
+        title: "Summary (imperative, lowercase, no period)"
+        initialValue: ""
+      - type: "confirm"
+        key: "Confirm"
+        title: "Commit"
+        body: "{{.Form.Type}}{{if .Form.Scope}}({{.Form.Scope}}){{end}}: {{.Form.Message}}"
+    command: 'git commit -m "{{.Form.Type}}{{if .Form.Scope}}({{.Form.Scope}}){{end}}: {{.Form.Message}}"'
+    loadingText: "committing"
+  # Open the current repo on GitHub
+  - key: "<c-o>"
+    context: "global"
+    description: "Open repo in browser"
+    command: "gh repo view --web"
+    loadingText: "opening"
