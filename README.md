@@ -1,110 +1,221 @@
 # ohmymac
 
-macOS dev environment: **Ghostty + Oh My Zsh + Starship + tmux + Neovim (LazyVim)**, with optional AeroSpace tiling, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
+A modular macOS dev setup: **Ghostty, Oh My Zsh, Starship, tmux and Neovim (LazyVim)**, plus optional language
+toolchains and desktop tweaks. Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
 
-## Install (fresh Mac)
+- **Pick what you want.** An interactive menu, or name the modules on the command line.
+- **Safe to re-run.** Idempotent; anything it replaces is backed up first.
+- **Reversible.** `uninstall.sh` removes modules and puts your previous files back.
+- **Previewable.** `--dry-run` shows every command without changing anything.
+
+Requires macOS on Apple Silicon. Homebrew is installed if missing.
+
+## Quick start
 
 ```sh
-git clone <this-repo-url> ~/Code/ohmymac
+git clone https://github.com/zerovoid99/ohmymac.git ~/Code/ohmymac
 ~/Code/ohmymac/install.sh
 ```
 
-An interactive menu lets you pick modules; `core` is preselected. Everything is idempotent and safe to re-run:
-existing files are backed up to `~/.dotfiles-backup/<timestamp>/` (same relative path as in `$HOME`), and
-command output goes to `~/Library/Logs/ohmymac/`. A failing module doesn't stop the others.
+The menu opens with `core` selected. Type numbers to toggle modules, then press Enter.
 
-| Module      | What it installs                                                                 |
-|-------------|----------------------------------------------------------------------------------|
-| `core`      | Homebrew, `Brewfile`, Ghostty, Oh My Zsh, config symlinks, tmux plugins           |
-| `cli`       | newer `curl`, `wget`, `rsync` from Homebrew, ahead of the macOS versions on PATH  |
-| `node`      | nvm (cloned from its repo, no profile edits) + Node.js LTS                        |
-| `rust`      | rustup + stable toolchain (official installer, `--no-modify-path`)                |
-| `go`        | Go from Homebrew; `go install` tools land in `~/go/bin`                          |
-| `ruby`      | rbenv + ruby-build + the latest stable Ruby                                      |
-| `python`    | uv (standalone, `uv self update`) + the latest Python via `uv python install`    |
-| `java`      | Eclipse Temurin JDK; `JAVA_HOME` is set automatically                            |
-| `herdr`     | [Herdr](https://herdr.dev), a desktop app for terminals and coding agents        |
-| `desktop`   | AeroSpace + JankyBorders (`Brewfile.desktop`), auto-hide menu bar, Spaces settings |
-| `macos`     | `macos/defaults.sh`: key repeat, no autocorrect, Dock, Finder, screenshots       |
-| `wallpaper` | Catppuccin Mocha wallpaper                                                       |
-
-Groups: `dev` = node, rust, go, ruby, python, java; `all` = everything.
-
-```sh
-./install.sh --list              # what's available and what's installed
-./install.sh dev                 # all language toolchains
-./install.sh rust python herdr   # exactly these (core is added if missing)
-./install.sh --all --dry-run     # preview, change nothing
-./install.sh -y                  # non-interactive: core only
+```text
+   1 [x] core       terminal setup: zsh, Starship, Ghostty, tmux, Neovim, git, CLI tools
+   2 [ ] cli        newer curl, wget and rsync from Homebrew, ahead of the macOS versions
+   3 [ ] node       nvm + Node.js LTS                                   ✓ installed (default 26)
+   ...
+>
 ```
 
-Tools that are already present (for example uv or Go from Homebrew, a JDK, an nvm default) are detected and left as they are.
+## Modules
+
+| Module      | Installs                                                                          |
+|-------------|-----------------------------------------------------------------------------------|
+| `core`      | Homebrew, the `Brewfile` packages, Ghostty, Oh My Zsh, config symlinks, tmux plugins |
+| `cli`       | Newer `curl`, `wget` and `rsync` from Homebrew, ahead of the macOS versions on PATH |
+| `node`      | nvm, cloned from its repo so no profile is edited, plus Node.js LTS               |
+| `rust`      | rustup and the stable toolchain (official installer)                              |
+| `go`        | Go from Homebrew; `go install` puts tools in `~/go/bin`                           |
+| `ruby`      | rbenv, ruby-build and the latest stable Ruby (compiled, takes a few minutes)      |
+| `python`    | uv (standalone, updates with `uv self update`) and the latest Python              |
+| `java`      | Eclipse Temurin JDK; `JAVA_HOME` is set for you                                   |
+| `herdr`     | [Herdr](https://herdr.dev), a desktop app for terminals and coding agents         |
+| `desktop`   | AeroSpace tiling and JankyBorders, auto-hide menu bar, Spaces settings            |
+| `macos`     | Fast key repeat, no autocorrect or smart quotes, Dock, Finder and screenshot defaults |
+| `wallpaper` | A Catppuccin Mocha wallpaper                                                      |
+
+Groups: **`dev`** = node, rust, go, ruby, python, java. **`all`** = every module.
+
+Toolchains you already have are detected and left alone, for example uv or Go from Homebrew, an existing JDK, or
+an nvm default.
+
+```sh
+./install.sh --list              # every module and whether it's installed
+./install.sh dev                 # all language toolchains
+./install.sh rust python herdr   # exactly these (core is added if it's missing)
+./install.sh --all --dry-run     # preview everything, change nothing
+./install.sh --yes               # no menu, no questions: core only
+```
+
+| Option          | Effect                                                  |
+|-----------------|---------------------------------------------------------|
+| `-a, --all`     | select every module                                     |
+| `-n, --dry-run` | print the commands instead of running them              |
+| `-y, --yes`     | skip the menu and prompts                               |
+| `-v, --verbose` | show command output live instead of a spinner           |
+| `-l, --list`    | list modules with their status                          |
+
+## After installing
+
+1. **Open a new terminal** (or run `exec zsh`).
+2. **Add an SSH key for GitHub.** Git sends every `https://github.com/` URL over SSH, and so do `gh` and Neovim's
+   plugin manager. Create `~/.ssh/id_ed25519` and add the public key to GitHub.
+3. **Check your git identity.** The installer asks for it once and saves it to `~/.gitconfig.local`.
+4. **Log out and back in** if you installed `macos` or `desktop`; some keyboard and Spaces settings need it.
+
+## Local overrides
+
+The repo is public, so anything personal or machine-specific lives in files next to the managed ones. These files
+are never committed, and the managed configs load them automatically.
+
+| File                  | For                                                                   |
+|-----------------------|-----------------------------------------------------------------------|
+| `~/.zshenv.local`     | Secrets and exports every process needs (`export ANTHROPIC_API_KEY=...`). Kept at `chmod 600`. |
+| `~/.zshrc.local`      | Personal aliases, functions and tool snippets (pnpm, opencode, ...)   |
+| `~/.gitconfig.local`  | `[user]` name and email, and any other personal git settings          |
+| `~/.ssh/config.local` | Machine-specific hosts (OrbStack, work servers)                       |
+
+If you already have a `~/.zshenv`, the installer moves it to `~/.zshenv.local` instead of burying it in a backup.
+
+Some installers append to `~/.zshrc`, which turns the symlink into a regular copy. When that happens, move the added
+lines to `~/.zshrc.local` and run `./install.sh core` to relink.
+
+## How the shell is wired
+
+| File           | Role                                                                                      |
+|----------------|-------------------------------------------------------------------------------------------|
+| `zsh/path.zsh` | The single PATH definition: `~/.local/bin`, cargo, nvm's default Node (without loading nvm), rbenv shims, `~/go/bin`, Homebrew curl, Homebrew. Directories that don't exist are dropped. |
+| `~/.zshenv`    | Read by every zsh, including scripts and non-interactive tools such as editors, Claude Code hooks and MCP servers. Loads `path.zsh`, then `~/.zshenv.local`. |
+| `~/.zshrc`     | Interactive setup: Oh My Zsh, Starship, fzf, aliases. Loads `path.zsh` again, because macOS `path_helper` moves the system directories back to the front in login shells, then loads `~/.zshrc.local`. |
+
+## Updating
+
+```sh
+cd ~/Code/ohmymac && git pull   # configs are symlinked, so changes apply right away
+./install.sh core               # only needed when new packages or links were added
+brew upgrade                    # packages; toolchains update through their own managers
+```
 
 ## Uninstall
 
 ```sh
-./uninstall.sh                   # interactive menu, nothing preselected
+./uninstall.sh                   # menu, nothing preselected
 ./uninstall.sh desktop ruby      # remove these modules
-./uninstall.sh core              # remove config symlinks, restore your previous files
+./uninstall.sh core              # remove config symlinks and restore your previous files
 ./uninstall.sh --all --purge -n  # preview removing everything, packages included
 ```
 
-Symlinks are only removed when they point into this repo, and the newest backup is put back. Packages, Oh My Zsh and
-tmux plugins stay unless you pass `--purge`. `macos` and `desktop` revert their settings to the macOS defaults
-(`macos/defaults.sh --revert`).
+- Symlinks are removed only when they point into this repo, and the newest backup is restored.
+- Packages, Oh My Zsh and tmux plugins stay unless you add `--purge`.
+- `macos` and `desktop` reset their settings to the macOS defaults.
+- `uninstall.sh` asks before it changes anything. Skip the question with `--yes`.
 
-## Shell files
+## Troubleshooting
 
-| File               | Role                                                                                   |
-|--------------------|----------------------------------------------------------------------------------------|
-| `~/.zshenv`        | → `zsh/.zshenv`. Read by every zsh, including scripts and tools like Claude Code hooks. Sets PATH, then loads `~/.zshenv.local`. |
-| `zsh/path.zsh`     | The one PATH definition: `~/.local/bin`, cargo, nvm's default Node (without loading nvm), rbenv shims, `~/go/bin`, keg-only curl, Homebrew. Missing dirs are dropped. |
-| `~/.zshrc`         | → `zsh/.zshrc`. Interactive setup; re-applies PATH because macOS `path_helper` reorders it in login shells. Loads `~/.zshrc.local` at the end. |
-| `~/.zshenv.local`  | Yours, not committed, `chmod 600`: secrets and personal exports (`export ANTHROPIC_API_KEY=...`). An existing `~/.zshenv` is moved here on install. |
-| `~/.zshrc.local`   | Yours, not committed: personal aliases and tool snippets (pnpm, etc.).                  |
+| Problem                                    | Look at                                                          |
+|--------------------------------------------|------------------------------------------------------------------|
+| A module failed                            | The log path printed in the summary (`~/Library/Logs/ohmymac/`). Fix the cause and re-run; finished modules are skipped quickly. |
+| A previous config file disappeared         | `~/.dotfiles-backup/<timestamp>/`, under the same path as in `$HOME` |
+| Repo changes to `.zshrc` have no effect    | `ls -l ~/.zshrc` should be a symlink; see [Local overrides](#local-overrides) |
+| `git clone` from GitHub asks for a key     | Add `~/.ssh/id_ed25519` to GitHub (see [After installing](#after-installing)) |
+| Ghostty shows config warnings              | `ghostty +validate-config`                                       |
 
-Installers that append to `~/.zshrc` replace the symlink with a regular file. If that happens, move the added lines to
-`~/.zshrc.local` and re-run `./install.sh core`.
+## Repository layout
 
-## Layout
-
-| Folder       | Linked to                                                           |
-|--------------|---------------------------------------------------------------------|
-| `zsh/`       | `~/.zshrc`, `~/.zshenv` (see [Shell files](#shell-files))           |
-| `starship/`  | `~/.config/starship.toml`                                           |
-| `fastfetch/` | `~/.config/fastfetch/config.jsonc`                                  |
-| `ghostty/`   | `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty` |
-| `git/`       | `~/.gitconfig` (identity lives in `~/.gitconfig.local`, not committed) |
-| `bat/`       | `~/.config/bat/`                                                    |
-| `nvim/`      | `~/.config/nvim` (LazyVim + Catppuccin)                             |
-| `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
-| `lazygit/`   | `~/Library/Application Support/lazygit/config.yml`                  |
-| `ssh/`       | `~/.ssh/config` (machine-specific hosts in `~/.ssh/config.local`; keys never in the repo) |
-| `aerospace/` | `~/.config/aerospace/aerospace.toml` (tiling window manager, `desktop` module) |
-| `borders/`   | `~/.config/borders/bordersrc` (focused-window border, `desktop` module)  |
-| `macos/`     | `defaults.sh`, `desktop.sh`, `wallpaper.sh`, run by modules (not linked) |
-| `lib/`       | installer internals: helpers, module definitions, menu              |
-
-Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
-
-GitHub is always reached over SSH: `https://github.com/...` URLs are rewritten to `git@github.com:` by git, and `gh` clones over SSH too. Put your key at `~/.ssh/id_ed25519` and add the public key to GitHub.
+| Path               | Linked to / used for                                                  |
+|--------------------|-----------------------------------------------------------------------|
+| `install.sh`       | Installer entry point                                                 |
+| `uninstall.sh`     | Uninstaller entry point                                               |
+| `lib/`             | Installer internals: helpers, module definitions, menu                |
+| `Brewfile`         | Packages for `core`                                                   |
+| `Brewfile.desktop` | Packages for `desktop`                                                |
+| `zsh/`             | `~/.zshrc`, `~/.zshenv`, plus `path.zsh`                              |
+| `starship/`        | `~/.config/starship.toml`                                             |
+| `ghostty/`         | `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`  |
+| `nvim/`            | `~/.config/nvim` (LazyVim + Catppuccin)                               |
+| `tmux/`            | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                         |
+| `git/`             | `~/.gitconfig`                                                        |
+| `lazygit/`         | `~/Library/Application Support/lazygit/config.yml`                    |
+| `bat/`             | `~/.config/bat/`                                                      |
+| `fastfetch/`       | `~/.config/fastfetch/config.jsonc`                                    |
+| `ssh/`             | `~/.ssh/config` (keys are never in the repo)                          |
+| `aerospace/`       | `~/.config/aerospace/aerospace.toml` (`desktop`)                      |
+| `borders/`         | `~/.config/borders/bordersrc` (`desktop`)                             |
+| `macos/`           | `defaults.sh`, `desktop.sh`, `wallpaper.sh`; each accepts `--revert` except the wallpaper |
 
 ## Cheat sheet
 
-**Navigation** — `cd proj` (zoxide, partial names work) · `fcd` pick a folder · `fe` pick & open a file · `..` `...`
+**Shell**
 
-**fzf** — `Ctrl+T` find file · `Ctrl+R` search history · `Alt+C` jump to folder
+| Keys / command      | Does                                              |
+|---------------------|---------------------------------------------------|
+| `cd proj`           | Jump with zoxide; partial names work (`cdi` picks interactively) |
+| `fcd` · `fe`        | Pick a folder to enter · pick a file to edit      |
+| `Ctrl+T` · `Ctrl+R` · `Alt+C` | fzf: find file · search history · jump to folder |
+| `..` · `...`        | Up one · two folders                              |
+| `killport 3000` · `ports` | Free a port · list listening ports          |
+| `reload` · `zshrc`  | Reload · edit the zsh config                      |
 
-**Git** — `gs` status · `gl` log graph · `gd` diff · `gfb` pick a branch · `lg` lazygit
+**Git**
 
-**lazygit** — `C` conventional commit (type → scope → summary) · `Ctrl+O` open repo on GitHub · `e` edit file in nvim · `?` all keys
+| Keys / command          | Does                                          |
+|-------------------------|-----------------------------------------------|
+| `gs` · `gd` · `gl`      | Status · diff · log graph                     |
+| `gfb`                   | Pick a branch with fzf and switch to it       |
+| `lg`                    | lazygit                                       |
+| `C` (in lazygit)        | Conventional commit: type → scope → summary   |
+| `Ctrl+O` (in lazygit)   | Open the repo on GitHub                       |
 
-**Ghostty** — `Cmd+T` new tab · `Cmd+N` new window · `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
+**Ghostty**
 
-**Neovim** — `v file` · `Space` leader, `Space e` file tree · `Space f f` find file · `Space s g` grep · `Space g g` lazygit · `Space l` plugin manager
+| Keys                       | Does                         |
+|----------------------------|------------------------------|
+| `Cmd+T` · `Cmd+N`          | New tab · new window         |
+| `Cmd+D` · `Cmd+Shift+D`    | Split right · split down     |
+| `Cmd+Alt+←↑↓→`             | Move between splits          |
+| `Cmd+Shift+Enter`          | Zoom the current split       |
+| `Cmd+Shift+R`              | Reload config                |
 
-**tmux** — prefix is `Ctrl+Space` · `tm` attach/create session for this folder · `prefix |` / `prefix -` split · `Ctrl+hjkl` move between panes (also inside Neovim) · `prefix m` zoom · `prefix 1..9` / `prefix n` / `prefix p` switch window · `prefix I` install plugins
+**tmux** (prefix is `Ctrl+Space`)
 
-**AeroSpace** (`desktop` module, Alt = Option) — `Alt+hjkl` focus · `Alt+Shift+hjkl` move window · `Alt+1..9` workspace · `Alt+Shift+1..9` send window there · `Alt+Tab` previous workspace · `Alt+/` tiles · `Alt+,` accordion · `Alt+f` fullscreen · `Alt+Shift+f` float · `Alt+-` / `Alt+=` resize · `Alt+Enter` new Ghostty · `Alt+Shift+;` then `r` reset layout
+| Keys                          | Does                                              |
+|-------------------------------|---------------------------------------------------|
+| `tm`                          | Attach to or create a session named after this folder |
+| `prefix \|` · `prefix -`      | Split right · split down                          |
+| `Ctrl+hjkl`                   | Move between panes, also across Neovim splits     |
+| `prefix m`                    | Zoom pane                                         |
+| `prefix 1..9` · `n` · `p`     | Switch window                                     |
+| `prefix I`                    | Install plugins                                   |
 
-**Misc** — `killport 3000` · `ports` · `ip` · `reload` · `zshrc` · `ghostty-config`
+**Neovim** (leader is `Space`)
+
+| Keys                | Does                    |
+|---------------------|-------------------------|
+| `v file`            | Open a file             |
+| `Space e`           | File tree               |
+| `Space f f` · `Space s g` | Find file · grep  |
+| `Space g g`         | lazygit                 |
+| `Space l`           | Plugin manager          |
+
+**AeroSpace** (`desktop` module, `Alt` is Option)
+
+| Keys                          | Does                                  |
+|-------------------------------|---------------------------------------|
+| `Alt+hjkl` · `Alt+Shift+hjkl` | Focus · move window                   |
+| `Alt+1..9` · `Alt+Shift+1..9` | Go to workspace · send window there   |
+| `Alt+Tab`                     | Previous workspace                    |
+| `Alt+/` · `Alt+,`             | Tiles · accordion layout              |
+| `Alt+f` · `Alt+Shift+f`       | Fullscreen · float                    |
+| `Alt+-` · `Alt+=`             | Resize                                |
+| `Alt+Enter`                   | New Ghostty window                    |
+| `Alt+Shift+;` then `r`        | Reset layout                          |
