@@ -59,6 +59,17 @@ run() {
   "$@"
 }
 
+# clean_output: make tool output readable in a log. Progress bars (curl, brew,
+# ruby-build) redraw with carriage returns, so only the last frame of each line is
+# kept; color and cursor escape codes are dropped. Line-buffered, so output streams.
+clean_output() {
+  LC_ALL=C sed -l \
+    -e $'s/\r$//' \
+    -e $'s/.*\r//' \
+    -e $'s/\x1b\\[[0-9;?]*[A-Za-z]//g' \
+    -e $'s/\x1b\\][^\x07]*\x07//g'
+}
+
 # task "label" <cmd> [args...]: run a slow, noisy command with its output in the log
 # and a spinner on screen. --verbose streams the output instead. On failure the tail
 # of the output is shown.
@@ -70,14 +81,24 @@ task() {
   fi
   printf '\n## %s\n$ %s\n' "$label" "$*" >> "$LOG"
   local start=$SECONDS rc
-  if [ "$VERBOSE" = 1 ] || [ "$IS_TTY" = 0 ]; then
+  if [ "$VERBOSE" = 1 ] && [ "$IS_TTY" = 1 ]; then
+    # live output (progress bars included) on screen, a clean copy in the log
+    info "$label"
+    local raw; raw=$(mktemp)
+    set +e
+    "$@" 2>&1 | tee "$raw"
+    rc=${PIPESTATUS[0]}
+    set -e
+    clean_output < "$raw" >> "$LOG"; rm -f "$raw"
+  elif [ "$IS_TTY" = 0 ]; then
+    # no terminal (CI, background job, redirected): clean output everywhere
     info "$label"
     set +e
-    "$@" 2>&1 | tee -a "$LOG"
+    "$@" 2>&1 < /dev/null | clean_output | tee -a "$LOG"
     rc=${PIPESTATUS[0]}
     set -e
   else
-    "$@" >> "$LOG" 2>&1 < /dev/null &
+    ( "$@" 2>&1 < /dev/null | clean_output; exit "${PIPESTATUS[0]}" ) >> "$LOG" &
     local pid=$! i=0
     local frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
     while kill -0 "$pid" 2>/dev/null; do
