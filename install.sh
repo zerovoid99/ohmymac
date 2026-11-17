@@ -22,6 +22,7 @@ ${c_bold}Groups:${c_off}   dev ($GROUP_dev), all
 
 ${c_bold}Options:${c_off}
   -a, --all       install every module
+  -u, --update    update the repo and every installed module (or just the ones named)
   -n, --dry-run   show what would happen, change nothing
   -y, --yes       no questions (also skips the git identity prompt)
   -v, --verbose   stream command output instead of a spinner
@@ -33,14 +34,17 @@ ${c_bold}Examples:${c_off}
   install.sh dev                 nvm, rustup, Go, rbenv, uv, JDK
   install.sh rust python herdr   just those
   install.sh --all --dry-run     preview everything
+  install.sh --update            git pull, brew upgrade, rustup, uv, nvm, plugins
 
 Remove things again with ./uninstall.sh.
 EOF
 }
 
+UPDATE=0
 for arg in "$@"; do
   case "$arg" in
     -a|--all)     add_selection all ;;
+    -u|--update)  UPDATE=1 ;;
     -n|--dry-run) DRY_RUN=1 ;;
     -y|--yes)     ASSUME_YES=1 ;;
     -v|--verbose) VERBOSE=1 ;;
@@ -52,6 +56,48 @@ for arg in "$@"; do
 done
 
 printf "\n${c_mauve}  ohmymac${c_off} ${c_dim}— macOS dev setup${c_off}\n"
+
+# ---------- --update ----------
+if [ "$UPDATE" = 1 ]; then
+  ACTION=update
+  log_init
+  # Pull first, then re-run the new code: bash reads this file while it runs.
+  if [ -z "${OHMYMAC_PULLED:-}" ] && [ "$DRY_RUN" = 0 ]; then
+    step "ohmymac repo"
+    if [ -n "$(git -C "$DOTFILES" status --porcelain)" ]; then
+      warn "the repo has local changes; git pull skipped"
+    else
+      before=$(git -C "$DOTFILES" rev-parse HEAD)
+      if task "git pull" git -C "$DOTFILES" pull --ff-only -q; then
+        if [ "$(git -C "$DOTFILES" rev-parse HEAD)" != "$before" ]; then
+          ok "repo updated, restarting with the new version"
+          exec env OHMYMAC_PULLED=1 "$DOTFILES/install.sh" "$@"
+        fi
+      else
+        warn "git pull failed; updating with the current version"
+      fi
+    fi
+  fi
+  brew_cache_reset
+  if [ -z "${SELECTED// /}" ]; then   # default: every installed module
+    for m in $MODULES; do
+      if "status_$m" >/dev/null 2>&1; then SELECTED="$SELECTED $m"; fi
+    done
+  fi
+  list=""
+  for m in $(ordered "$SELECTED"); do
+    type "update_$m" >/dev/null 2>&1 && list="$list $m"
+  done
+  list="${list# }"
+  [ -n "$list" ] || { echo "nothing to update"; exit 0; }
+  step "Plan"
+  info "update: ${c_bold}$list${c_off}"
+  [ "$DRY_RUN" = 1 ] && warn "dry run: nothing will be changed"
+  rc=0
+  run_modules "$list" || rc=$?
+  printf "\n"
+  exit "$rc"
+fi
 
 if [ -z "${SELECTED// /}" ]; then
   if [ -t 0 ] && [ -t 1 ] && [ "$ASSUME_YES" = 0 ]; then

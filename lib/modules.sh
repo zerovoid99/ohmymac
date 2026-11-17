@@ -4,8 +4,9 @@
 #   status_<m>     exit 0 when installed; may print a short detail ("brew", "v1.2")
 #   install_<m>    idempotent install
 #   uninstall_<m>  remove it again (PURGE=1 also removes data and shared packages)
+#   update_<m>     optional; bring it up to date (install.sh --update)
 
-MODULES="core cli node rust go ruby python java herdr desktop macos wallpaper"
+MODULES="core cli apps node rust go ruby python java herdr desktop macos wallpaper"
 GROUP_dev="node rust go ruby python java"
 PURGE=0
 
@@ -114,7 +115,24 @@ EOF
     /Applications/Ghostty.app/Contents/MacOS/ghostty +validate-config >/dev/null 2>&1 \
       && ok "ghostty config valid" || warn "ghostty config has warnings, run: ghostty +validate-config"
   fi
+  run git -C "$DOTFILES" config core.hooksPath .githooks && ok "pre-commit secret scan enabled for this repo"
   [ -f "$HOME/.ssh/id_ed25519" ] || warn "no ~/.ssh/id_ed25519 yet: GitHub (and Neovim's first plugin sync) need it"
+}
+
+update_core() {
+  step "Homebrew"
+  task "brew update" brew update
+  task "brew upgrade (formulae)" brew upgrade --formula
+  # casks can ask for a password; apps that update themselves are skipped by brew
+  task_interactive "brew upgrade --cask" brew upgrade --cask
+
+  step "Shell and editor plugins"
+  if [ -f "$HOME/.oh-my-zsh/tools/upgrade.sh" ]; then
+    task "Oh My Zsh" env ZSH="$HOME/.oh-my-zsh" zsh "$HOME/.oh-my-zsh/tools/upgrade.sh"
+  fi
+  local tpm="$HOME/.config/tmux/plugins/tpm"
+  if [ -x "$tpm/bin/update_plugins" ]; then task "tmux plugins" "$tpm/bin/update_plugins" all; fi
+  if has nvim; then task "Neovim plugins (Lazy sync)" nvim --headless "+Lazy! sync" +qa; fi
 }
 
 uninstall_core() {
@@ -127,6 +145,7 @@ EOF
     run mv "$HOME/.zshenv.local" "$HOME/.zshenv"
     ok "moved ~/.zshenv.local back to ~/.zshenv"
   fi
+  run git -C "$DOTFILES" config --unset core.hooksPath 2>/dev/null || true
   if [ "$PURGE" = 1 ]; then
     step "Packages and plugins (--purge)"
     run rm -rf "$HOME/.oh-my-zsh" && ok "removed Oh My Zsh"
@@ -153,6 +172,29 @@ install_cli() {
 }
 uninstall_cli() { brew_uninstall $CLI_FORMULAS; }
 
+# ============================================================ apps
+APPS_BREWFILE="$DOTFILES/Brewfile.apps"
+# brewfile_entries <file> <brew|cask> -> one name per line
+brewfile_entries() { sed -nE "s/^$2 \"([^\"]+)\".*/\1/p" "$1"; }
+desc_apps() { echo "everyday apps and tools from Brewfile.apps (Docker CLI, gitleaks, VS Code, ...)"; }
+status_apps() {
+  local f
+  for f in $(brewfile_entries "$APPS_BREWFILE" brew); do brew_has "$f" || return 1; done
+  for f in $(brewfile_entries "$APPS_BREWFILE" cask); do brew_has_cask "$f" || return 1; done
+}
+install_apps() {
+  task "brew bundle (Brewfile.apps)" env HOMEBREW_NO_AUTO_UPDATE=1 brew bundle --file="$APPS_BREWFILE" --no-upgrade
+}
+uninstall_apps() {
+  # shellcheck disable=SC2046
+  brew_uninstall $(brewfile_entries "$APPS_BREWFILE" brew)
+  local c casks=""
+  for c in $(brewfile_entries "$APPS_BREWFILE" cask); do brew_has_cask "$c" && casks="$casks $c"; done
+  # shellcheck disable=SC2086
+  if [ -n "$casks" ]; then task "brew uninstall --cask$casks" brew uninstall --cask $casks; fi
+  return 0
+}
+
 # ============================================================ node
 NVM_DIR_="${NVM_DIR:-$HOME/.nvm}"
 desc_node() { echo "nvm + Node.js LTS"; }
@@ -168,7 +210,7 @@ install_node() {
     # Manual install from the repo: no install script editing shell profiles.
     task "cloning nvm" git_plain clone -q https://github.com/nvm-sh/nvm.git "$NVM_DIR_"
     if [ "$DRY_RUN" = 0 ]; then
-      local tag; tag=$(git -C "$NVM_DIR_" describe --abbrev=0 --tags --match 'v[0-9]*' "$(git -C "$NVM_DIR_" rev-list --tags --max-count=1)")
+      local tag; tag=$(nvm_latest_tag)
       task "checking out nvm $tag" git -C "$NVM_DIR_" -c advice.detachedHead=false checkout -q "$tag"
     fi
   fi
@@ -179,6 +221,24 @@ install_node() {
     task "nvm alias default lts/*" nvm_run alias default 'lts/*'
   fi
 }
+nvm_latest_tag() {
+  git -C "$NVM_DIR_" describe --abbrev=0 --tags --match 'v[0-9]*' "$(git -C "$NVM_DIR_" rev-list --tags --max-count=1)"
+}
+update_node() {
+  [ -d "$NVM_DIR_/.git" ] || { info "nvm isn't a git checkout; skipped"; return 0; }
+  task "fetching nvm releases" git_plain -C "$NVM_DIR_" fetch -q --tags origin
+  if [ "$DRY_RUN" = 0 ]; then
+    local tag; tag=$(nvm_latest_tag)
+    task "nvm $tag" git -C "$NVM_DIR_" -c advice.detachedHead=false checkout -q "$tag"
+  fi
+  local def; def=$(cat "$NVM_DIR_/alias/default" 2>/dev/null || true)
+  if [ -n "$def" ]; then
+    # installs the newest release matching the default (e.g. "26" -> latest 26.x)
+    task "nvm install $def" nvm_run install "$def" --latest-npm
+    info "global npm packages stay on the old version; move them with: nvm reinstall-packages <old>"
+  fi
+}
+
 uninstall_node() {
   [ -d "$NVM_DIR_" ] || { info "nvm not installed"; return 0; }
   run rm -rf "$NVM_DIR_" && ok "removed $(tilde "$NVM_DIR_") (nvm and every Node version)"
@@ -197,6 +257,9 @@ install_rust() {
     warn "Rust from Homebrew found; it can shadow rustup. Consider: brew uninstall rust"
   fi
   task "installing rustup" sh -c "curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --no-modify-path"
+}
+update_rust() {
+  if status_rust; then task "rustup update" "$HOME/.cargo/bin/rustup" update; fi
 }
 uninstall_rust() {
   status_rust || { info "rustup not installed"; return 0; }
@@ -229,6 +292,19 @@ install_ruby() {
   if [ "$("$rbenv" global)" = system ]; then run "$rbenv" global "$latest" && ok "rbenv global $latest"; fi
   if brew_has ruby; then info "Ruby from Homebrew is still installed; rbenv shims take precedence"; fi
 }
+update_ruby() {
+  # ruby-build itself is upgraded by brew in update_core; new Rubies are opt-in
+  [ "$DRY_RUN" = 1 ] && return 0
+  local rbenv="$BREW_PREFIX/bin/rbenv" latest current
+  [ -x "$rbenv" ] || return 0
+  latest=$("$rbenv" install -l 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | tail -1)
+  current=$("$rbenv" global)
+  if [ -n "$latest" ] && [ "$latest" != "$current" ]; then
+    warn "Ruby $latest is available (global is $current): rbenv install $latest && rbenv global $latest"
+  else
+    ok "Ruby $current is the latest"
+  fi
+}
 uninstall_ruby() {
   brew_uninstall rbenv ruby-build
   [ -d "$HOME/.rbenv" ] && run rm -rf "$HOME/.rbenv" && ok "removed ~/.rbenv (every Ruby version)"
@@ -252,6 +328,12 @@ install_python() {
   fi
   local uv="$HOME/.local/bin/uv"; [ -x "$uv" ] || uv=uv
   task "uv python install" "$uv" python install
+}
+update_python() {
+  local uv="$HOME/.local/bin/uv"
+  if [ -x "$uv" ]; then task "uv self update" "$uv" self update
+  else uv=uv; has uv || return 0; fi   # Homebrew's uv is upgraded in update_core
+  task "uv tool upgrade --all" "$uv" tool upgrade --all
 }
 uninstall_python() {
   if [ -x "$HOME/.local/bin/uv" ]; then

@@ -1,0 +1,22 @@
+# ohmymac — everyday apps and dev tools (install.sh apps)
+# usage: brew bundle --file=Brewfile.apps
+
+# containers (the engine comes from OrbStack or Docker Desktop)
+brew "docker"
+brew "docker-buildx"
+brew "docker-compose"
+
+# security scanning
+brew "gitleaks"   # secrets in git history (also used by this repo's pre-commit hook)
+brew "semgrep"    # static analysis
+brew "trivy"      # vulnerabilities in images, dependencies and IaC
+
+# misc dev tools
+brew "just"         # command runner
+brew "cloudflared"  # Cloudflare tunnels
+brew "ffmpeg"
+brew "imagemagick"
+
+# apps
+cask "visual-studio-code"
+cask "inkscape"

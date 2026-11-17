@@ -111,14 +111,18 @@ run_modules() {
     n=$((n + 1))
     header "[$n/$total] ${ACTION} ${m} ${c_dim}— $("desc_$m")"
     brew_cache_reset
+    TASK_FAILURES=$(mktemp); export TASK_FAILURES
     set +e
     ( set -e; "${ACTION}_$m" )
     rc=$?
     set -e
+    [ -s "$TASK_FAILURES" ] && [ "$rc" = 0 ] && rc=1
+    rm -f "$TASK_FAILURES"; TASK_FAILURES=
     if [ "$rc" = 0 ]; then done_list="$done_list $m"; else failed_list="$failed_list $m"; fi
   done
 
-  local verb="installed"; [ "$ACTION" = uninstall ] && verb="removed"
+  local verb="installed"
+  case "$ACTION" in uninstall) verb="removed" ;; update) verb="updated" ;; esac
   [ "$DRY_RUN" = 1 ] && verb="planned"
   header "Summary ${c_dim}($((SECONDS - start))s)"
   [ -n "$done_list" ]   && ok "$verb:${done_list}"

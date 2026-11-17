@@ -111,6 +111,9 @@ task() {
   if [ "$rc" = 0 ]; then
     ok "$label ${c_dim}($((SECONDS - start))s)${c_off}"
   else
+    # Recorded for run_modules: bash 3.2's `set -e` misses failures at the end of an
+    # `a && b` list, so the exit status alone can't be trusted to fail the module.
+    [ -n "${TASK_FAILURES:-}" ] && printf '%s\n' "$label" >> "$TASK_FAILURES"
     err "$label failed (exit $rc)"
     if [ "$VERBOSE" = 0 ] && [ "$IS_TTY" = 1 ]; then
       tail -n 15 "$LOG" | sed "s/^/    ${c_dim}│${c_off} /"
