@@ -1,0 +1,11 @@
+#!/bin/sh
+# Block commits that contain secrets (API keys, tokens). This repo is public.
+# Enabled by `install.sh core` (git config core.hooksPath .githooks).
+# Bypass for a known false positive: git commit --no-verify
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks not installed, secret scan skipped (install.sh apps)" >&2
+  exit 0
+fi
+
+exec gitleaks git --pre-commit --staged --redact --verbose --no-banner --log-level warn
