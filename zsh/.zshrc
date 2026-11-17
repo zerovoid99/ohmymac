@@ -83,7 +83,7 @@ export FZF_DEFAULT_OPTS="--height 50% --layout=reverse --border --info=inline \
 --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
 --color=selected-bg:#45475a,border:#6c7086,label:#cdd6f4"
 
-# --- Aliases: modern replacements for ls / cat / find / grep ---
+# --- Aliases: modern tools ---
 export EZA_COLORS="bu=33:da=90:uu=90:gu=90"   # no underline on build files, dim dates/owners
 if command -v eza >/dev/null; then
   alias ls="eza --icons --group-directories-first"
@@ -92,12 +92,8 @@ if command -v eza >/dev/null; then
   alias lt="eza --tree --level=2 --icons --group-directories-first"
   alias ltt="eza --tree --level=3 --icons --group-directories-first"
 fi
-command -v bat     >/dev/null && alias cat="bat --paging=never"
-command -v fd      >/dev/null && alias find="fd"
-command -v rg      >/dev/null && alias grep="rg"
-command -v dust    >/dev/null && alias du="dust"
-command -v duf     >/dev/null && alias df="duf"
-command -v btop    >/dev/null && alias top="btop"
+# bat, fd, rg, dust, duf and btop are used under their own names: aliasing them over
+# cat/find/grep/du/df/top breaks commands pasted from docs, whose flags differ.
 command -v lazygit >/dev/null && alias lg="lazygit"
 command -v nvim    >/dev/null && alias vim="nvim" vi="nvim" v="nvim"
 alias ta="tmux attach -t"
