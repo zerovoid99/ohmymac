@@ -2,8 +2,10 @@
 #  ~/.zshrc — Oh My Zsh + Starship  (managed by ~/Code/ohmymac)
 # ============================================================
 
-# --- PATH ---
-export PATH="$HOME/bin:$HOME/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+# Personal additions go in ~/.zshrc.local (not committed); secrets in ~/.zshenv.local.
+
+# --- PATH --- (already set by ~/.zshenv; re-applied because macOS path_helper reorders it)
+source "${${(%):-%x}:A:h}/path.zsh"
 
 # --- Oh My Zsh ---
 export ZSH="$HOME/.oh-my-zsh"
@@ -61,6 +63,8 @@ command -v zoxide   >/dev/null && eval "$(zoxide init zsh --cmd cd)"   # cd = sm
 alias z="cd"
 alias zi="cdi"
 command -v starship >/dev/null && eval "$(starship init zsh)"
+command -v rbenv    >/dev/null && eval "$(rbenv init - --no-rehash zsh)"
+[[ -z $JAVA_HOME ]] && JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null) && export JAVA_HOME
 
 # Blank line between commands, but not at the top of a fresh or cleared screen
 _prompt_spacer() { [[ -n $_PROMPT_SEEN ]] && print; _PROMPT_SEEN=1 }
@@ -158,6 +162,9 @@ tm() {
   fi
 }
 gfb()     { git branch --all | grep -v HEAD | fzf --preview 'git log --oneline --graph --color=always {1}' | sed 's/.* //;s#remotes/origin/##' | xargs git switch; }  # fuzzy git branch
+
+# --- Local overrides (not committed) ---
+[[ -r ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # --- Syntax highlighting (MUST be sourced last) ---
 [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
