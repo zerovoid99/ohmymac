@@ -1,0 +1,8 @@
+# ohmymac — optional desktop packages (install.sh --desktop)
+# usage: brew bundle --file=Brewfile.desktop
+
+# tiling window manager, focused-window border
+tap "nikitabobko/tap"
+tap "FelixKratz/formulae"
+cask "aerospace"
+brew "borders"

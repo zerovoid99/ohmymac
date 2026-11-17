@@ -1,6 +1,6 @@
 # ohmymac
 
-macOS dev environment: **Ghostty + Oh My Zsh + Starship + tmux + Neovim (LazyVim) + AeroSpace tiling**, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
+macOS dev environment: **Ghostty + Oh My Zsh + Starship + tmux + Neovim (LazyVim)**, with optional AeroSpace tiling, Catppuccin Mocha everywhere, JetBrainsMono Nerd Font.
 
 ## Install (fresh Mac)
 
@@ -11,6 +11,19 @@ git clone <this-repo-url> ~/Code/ohmymac
 
 The script installs Homebrew, every package in `Brewfile`, Oh My Zsh, then symlinks the configs into `$HOME`.
 Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-run.
+
+Only the terminal setup is installed by default. Opt in to the rest with flags:
+
+| Flag          | Adds                                                                         |
+|---------------|------------------------------------------------------------------------------|
+| `--desktop`   | AeroSpace + JankyBorders (`Brewfile.desktop`), their configs, and `macos/desktop.sh` (auto-hide menu bar, Spaces settings) |
+| `--macos`     | `macos/defaults.sh`: key repeat, no autocorrect, Dock, Finder, screenshots, trackpad |
+| `--wallpaper` | `macos/wallpaper.sh`: Catppuccin Mocha wallpaper                             |
+| `--all`       | all of the above                                                             |
+
+```sh
+~/Code/ohmymac/install.sh --macos --wallpaper
+```
 
 ## Layout
 
@@ -26,9 +39,9 @@ Existing files are backed up to `~/.dotfiles-backup/<timestamp>/`. Safe to re-ru
 | `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
 | `lazygit/`   | `~/Library/Application Support/lazygit/config.yml`                  |
 | `ssh/`       | `~/.ssh/config` (keys themselves are never in the repo)              |
-| `aerospace/` | `~/.config/aerospace/aerospace.toml` (tiling window manager)        |
-| `borders/`   | `~/.config/borders/bordersrc` (focused-window border)               |
-| `macos/`     | `defaults.sh` and `wallpaper.sh`, run by the installer (not linked)  |
+| `aerospace/` | `~/.config/aerospace/aerospace.toml` (tiling window manager, `--desktop`) |
+| `borders/`   | `~/.config/borders/bordersrc` (focused-window border, `--desktop`)  |
+| `macos/`     | `defaults.sh`, `desktop.sh`, `wallpaper.sh`, run on request (not linked) |
 
 Everything is symlinked, so editing a file here takes effect immediately. Commit to keep it.
 
@@ -44,12 +57,12 @@ GitHub is always reached over SSH: `https://github.com/...` URLs are rewritten t
 
 **lazygit** — `C` conventional commit (type → scope → summary) · `Ctrl+O` open repo on GitHub · `e` edit file in nvim · `?` all keys
 
-**Ghostty** — `Cmd+T` / `Cmd+N` new window (tiled by AeroSpace; native tabs are disabled because AeroSpace treats each tab as a window) · `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
+**Ghostty** — `Cmd+T` new tab · `Cmd+N` new window · `Cmd+D` split right · `Cmd+Shift+D` split down · `Cmd+Alt+←↑↓→` move between splits · `Cmd+Shift+Enter` zoom · `Cmd+Shift+R` reload config
 
 **Neovim** — `v file` · `Space` leader, `Space e` file tree · `Space f f` find file · `Space s g` grep · `Space g g` lazygit · `Space l` plugin manager
 
 **tmux** — prefix is `Ctrl+Space` · `tm` attach/create session for this folder · `prefix |` / `prefix -` split · `Ctrl+hjkl` move between panes (also inside Neovim) · `prefix m` zoom · `prefix 1..9` / `prefix n` / `prefix p` switch window · `prefix I` install plugins
 
-**AeroSpace** (Alt = Option) — `Alt+hjkl` focus · `Alt+Shift+hjkl` move window · `Alt+1..9` workspace · `Alt+Shift+1..9` send window there · `Alt+Tab` previous workspace · `Alt+/` tiles · `Alt+,` accordion · `Alt+f` fullscreen · `Alt+Shift+f` float · `Alt+-` / `Alt+=` resize · `Alt+Enter` new Ghostty · `Alt+Shift+;` then `r` reset layout
+**AeroSpace** (`--desktop`, Alt = Option) — `Alt+hjkl` focus · `Alt+Shift+hjkl` move window · `Alt+1..9` workspace · `Alt+Shift+1..9` send window there · `Alt+Tab` previous workspace · `Alt+/` tiles · `Alt+,` accordion · `Alt+f` fullscreen · `Alt+Shift+f` float · `Alt+-` / `Alt+=` resize · `Alt+Enter` new Ghostty · `Alt+Shift+;` then `r` reset layout
 
 **Misc** — `killport 3000` · `ports` · `ip` · `reload` · `zshrc` · `ghostty-config`

@@ -1,8 +1,38 @@
 #!/usr/bin/env bash
 # ohmymac — one-command macOS terminal setup.
-#   git clone <repo> ~/Code/ohmymac && ~/Code/ohmymac/install.sh
+#   git clone <repo> ~/Code/ohmymac && ~/Code/ohmymac/install.sh [options]
 # Idempotent: existing files are backed up, then symlinked to this repo.
+# Only the terminal setup is installed by default; everything else is opt-in.
 set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: install.sh [options]
+
+Installs the terminal setup: Homebrew packages, Oh My Zsh, Ghostty, Starship,
+tmux, Neovim, git, lazygit, bat and ssh configs. Optional modules are off
+unless you pass their flag:
+
+  --desktop     AeroSpace tiling + JankyBorders, and the menu bar / Spaces
+                defaults they need (macos/desktop.sh)
+  --macos       developer-friendly macOS defaults (macos/defaults.sh)
+  --wallpaper   download and set a Catppuccin Mocha wallpaper
+  --all         all of the above
+  -h, --help    show this help
+EOF
+}
+
+WITH_DESKTOP=0; WITH_MACOS=0; WITH_WALLPAPER=0
+for arg in "$@"; do
+  case "$arg" in
+    --desktop)   WITH_DESKTOP=1 ;;
+    --macos)     WITH_MACOS=1 ;;
+    --wallpaper) WITH_WALLPAPER=1 ;;
+    --all)       WITH_DESKTOP=1; WITH_MACOS=1; WITH_WALLPAPER=1 ;;
+    -h|--help)   usage; exit 0 ;;
+    *)           printf "unknown option: %s\n\n" "$arg" >&2; usage >&2; exit 1 ;;
+  esac
+done
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
@@ -25,6 +55,9 @@ ok "brew $(brew --version | head -1 | awk '{print $2}')"
 # ---------- 2. Packages ----------
 step "Packages from Brewfile"
 HOMEBREW_NO_AUTO_UPDATE=1 brew bundle --file="$DOTFILES/Brewfile" --no-upgrade
+if [ "$WITH_DESKTOP" = 1 ]; then
+  HOMEBREW_NO_AUTO_UPDATE=1 brew bundle --file="$DOTFILES/Brewfile.desktop" --no-upgrade
+fi
 if [ ! -d /Applications/Ghostty.app ]; then
   brew install --cask ghostty
 fi
@@ -68,8 +101,10 @@ link "$DOTFILES/nvim"                                "$HOME/.config/nvim"
 link "$DOTFILES/tmux/tmux.conf"                      "$HOME/.config/tmux/tmux.conf"
 link "$DOTFILES/lazygit/config.yml"                  "$LAZYGIT_DIR/config.yml"
 link "$DOTFILES/ssh/config"                          "$HOME/.ssh/config"
-link "$DOTFILES/aerospace/aerospace.toml"            "$HOME/.config/aerospace/aerospace.toml"
-link "$DOTFILES/borders/bordersrc"                   "$HOME/.config/borders/bordersrc"
+if [ "$WITH_DESKTOP" = 1 ]; then
+  link "$DOTFILES/aerospace/aerospace.toml"          "$HOME/.config/aerospace/aerospace.toml"
+  link "$DOTFILES/borders/bordersrc"                 "$HOME/.config/borders/bordersrc"
+fi
 chmod 700 "$HOME/.ssh"; chmod 600 "$DOTFILES/ssh/config"
 
 # ---------- 5. tmux plugins (TPM) ----------
@@ -80,13 +115,22 @@ if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
 fi
 GIT_CONFIG_GLOBAL=/dev/null "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" >/dev/null && ok "tmux plugins installed"
 
-# ---------- 6. macOS defaults ----------
-step "macOS defaults"
-"$DOTFILES/macos/defaults.sh" >/dev/null && ok "defaults applied"
-if "$DOTFILES/macos/wallpaper.sh" >/dev/null; then
-  ok "catppuccin wallpaper set"
-else
-  warn "wallpaper not set (offline or no Automation access), run: macos/wallpaper.sh"
+# ---------- 6. Optional macOS tweaks ----------
+if [ "$WITH_MACOS" = 1 ] || [ "$WITH_DESKTOP" = 1 ] || [ "$WITH_WALLPAPER" = 1 ]; then
+  step "macOS tweaks"
+fi
+if [ "$WITH_MACOS" = 1 ]; then
+  "$DOTFILES/macos/defaults.sh" >/dev/null && ok "defaults applied"
+fi
+if [ "$WITH_DESKTOP" = 1 ]; then
+  "$DOTFILES/macos/desktop.sh" >/dev/null && ok "menu bar / Spaces defaults applied"
+fi
+if [ "$WITH_WALLPAPER" = 1 ]; then
+  if "$DOTFILES/macos/wallpaper.sh" >/dev/null; then
+    ok "catppuccin wallpaper set"
+  else
+    warn "wallpaper not set (offline or no Automation access), run: macos/wallpaper.sh"
+  fi
 fi
 
 # ---------- 7. Finishing touches ----------
@@ -115,8 +159,16 @@ if [ -d /Applications/Ghostty.app ]; then
     && ok "ghostty config valid" || warn "ghostty config has warnings, run: ghostty +validate-config"
 fi
 
-if [ -d /Applications/AeroSpace.app ]; then
+if [ "$WITH_DESKTOP" = 1 ] && [ -d /Applications/AeroSpace.app ]; then
   open -a AeroSpace && ok "AeroSpace started (grant Accessibility access when asked)"
 fi
 
-printf "\n${c_green}Done!${c_off} Quit Ghostty (Cmd+Q) and reopen it, or run: ${c_dim}exec zsh${c_off}\n\n"
+printf "\n${c_green}Done!${c_off} Quit Ghostty (Cmd+Q) and reopen it, or run: ${c_dim}exec zsh${c_off}\n"
+skipped=()
+[ "$WITH_DESKTOP" = 1 ]   || skipped+=(--desktop)
+[ "$WITH_MACOS" = 1 ]     || skipped+=(--macos)
+[ "$WITH_WALLPAPER" = 1 ] || skipped+=(--wallpaper)
+if [ ${#skipped[@]} -gt 0 ]; then
+  printf "${c_dim}Optional modules not installed: %s (see install.sh --help)${c_off}\n" "${skipped[*]}"
+fi
+printf "\n"

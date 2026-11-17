@@ -31,11 +31,5 @@ brew "neovim"
 brew "tmux"
 brew "jq"
 
-# desktop: tiling window manager, focused-window border
-tap "nikitabobko/tap"
-tap "FelixKratz/formulae"
-cask "aerospace"
-brew "borders"
-
 # font
 cask "font-jetbrains-mono-nerd-font"
