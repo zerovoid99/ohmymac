@@ -75,14 +75,19 @@ chmod 700 "$HOME/.ssh"; chmod 600 "$DOTFILES/ssh/config"
 # ---------- 5. tmux plugins (TPM) ----------
 step "tmux plugins"
 if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
-  git clone -q https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
+  # ignore ~/.gitconfig: its https->ssh rewrite fails before an SSH key is set up
+  GIT_CONFIG_GLOBAL=/dev/null git clone -q https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
 fi
-"$HOME/.config/tmux/plugins/tpm/bin/install_plugins" >/dev/null && ok "tmux plugins installed"
+GIT_CONFIG_GLOBAL=/dev/null "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" >/dev/null && ok "tmux plugins installed"
 
 # ---------- 6. macOS defaults ----------
 step "macOS defaults"
 "$DOTFILES/macos/defaults.sh" >/dev/null && ok "defaults applied"
-"$DOTFILES/macos/wallpaper.sh" >/dev/null && ok "catppuccin wallpaper set"
+if "$DOTFILES/macos/wallpaper.sh" >/dev/null; then
+  ok "catppuccin wallpaper set"
+else
+  warn "wallpaper not set (offline or no Automation access), run: macos/wallpaper.sh"
+fi
 
 # ---------- 7. Finishing touches ----------
 step "Finishing touches"
