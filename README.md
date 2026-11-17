@@ -79,7 +79,7 @@ Installers that append to `~/.zshrc` replace the symlink with a regular file. If
 | `nvim/`      | `~/.config/nvim` (LazyVim + Catppuccin)                             |
 | `tmux/`      | `~/.config/tmux/tmux.conf` (TPM + Catppuccin)                       |
 | `lazygit/`   | `~/Library/Application Support/lazygit/config.yml`                  |
-| `ssh/`       | `~/.ssh/config` (keys themselves are never in the repo)              |
+| `ssh/`       | `~/.ssh/config` (machine-specific hosts in `~/.ssh/config.local`; keys never in the repo) |
 | `aerospace/` | `~/.config/aerospace/aerospace.toml` (tiling window manager, `desktop` module) |
 | `borders/`   | `~/.config/borders/bordersrc` (focused-window border, `desktop` module)  |
 | `macos/`     | `defaults.sh`, `desktop.sh`, `wallpaper.sh`, run by modules (not linked) |

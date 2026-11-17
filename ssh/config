@@ -1,5 +1,9 @@
 # SSH client config (managed by ~/Code/ohmymac)
 
+# Machine-specific hosts and tool snippets (OrbStack, work servers) go in
+# ~/.ssh/config.local, not committed. Include must come before any Host block.
+Include ~/.ssh/config.local
+
 Host *
   AddKeysToAgent yes
   UseKeychain yes
