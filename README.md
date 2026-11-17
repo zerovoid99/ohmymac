@@ -12,6 +12,15 @@ Requires macOS on Apple Silicon. Homebrew is installed if missing.
 
 ## Quick start
 
+On a brand-new Mac, one command does everything: it installs the Xcode Command Line Tools (so `git` exists),
+clones this repo to `~/Code/ohmymac`, and opens the installer.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/zerovoid99/ohmymac/main/bootstrap.sh | bash
+```
+
+Arguments are passed to the installer, e.g. `... | bash -s -- dev herdr`. If git is already there:
+
 ```sh
 git clone https://github.com/zerovoid99/ohmymac.git ~/Code/ohmymac
 ~/Code/ohmymac/install.sh
@@ -33,6 +42,7 @@ The menu opens with `core` selected. Type numbers to toggle modules, then press 
 |-------------|-----------------------------------------------------------------------------------|
 | `core`      | Homebrew, the `Brewfile` packages, Ghostty, Oh My Zsh, config symlinks, tmux plugins |
 | `cli`       | Newer `curl`, `wget` and `rsync` from Homebrew, ahead of the macOS versions on PATH |
+| `apps`      | Everything in `Brewfile.apps`: Docker CLI, gitleaks, semgrep, trivy, just, cloudflared, ffmpeg, ImageMagick, VS Code, Inkscape |
 | `node`      | nvm, cloned from its repo so no profile is edited, plus Node.js LTS               |
 | `rust`      | rustup and the stable toolchain (official installer)                              |
 | `go`        | Go from Homebrew; `go install` puts tools in `~/go/bin`                           |
@@ -55,11 +65,13 @@ an nvm default.
 ./install.sh rust python herdr   # exactly these (core is added if it's missing)
 ./install.sh --all --dry-run     # preview everything, change nothing
 ./install.sh --yes               # no menu, no questions: core only
+./install.sh --update            # update the repo and everything installed
 ```
 
 | Option          | Effect                                                  |
 |-----------------|---------------------------------------------------------|
 | `-a, --all`     | select every module                                     |
+| `-u, --update`  | update the repo and installed modules (see [Updating](#updating)) |
 | `-n, --dry-run` | print the commands instead of running them              |
 | `-y, --yes`     | skip the menu and prompts                               |
 | `-v, --verbose` | show command output live instead of a spinner           |
@@ -101,10 +113,21 @@ lines to `~/.zshrc.local` and run `./install.sh core` to relink.
 ## Updating
 
 ```sh
-cd ~/Code/ohmymac && git pull   # configs are symlinked, so changes apply right away
-./install.sh core               # only needed when new packages or links were added
-brew upgrade                    # packages; toolchains update through their own managers
+./install.sh --update            # everything installed
+./install.sh --update rust node  # just these
 ```
+
+| Step      | What runs                                                                          |
+|-----------|------------------------------------------------------------------------------------|
+| repo      | `git pull --ff-only`, then the installer restarts with the new code (skipped when the repo has local changes) |
+| `core`    | `brew update`, `brew upgrade` (every Homebrew package, not only ohmymac's), Oh My Zsh, tmux plugins, Neovim plugins |
+| `node`    | nvm to its latest release, then the newest Node matching your default (`26` → latest 26.x) |
+| `rust`    | `rustup update`                                                                    |
+| `python`  | `uv self update` (standalone uv) and `uv tool upgrade --all`                      |
+| `ruby`    | Reports a newer Ruby if there is one; switching versions stays your call          |
+
+Configs are symlinked, so a plain `git pull` already applies config changes. Run `./install.sh core` when new
+packages or links were added.
 
 ## Uninstall
 
@@ -119,6 +142,13 @@ brew upgrade                    # packages; toolchains update through their own 
 - Packages, Oh My Zsh and tmux plugins stay unless you add `--purge`.
 - `macos` and `desktop` reset their settings to the macOS defaults.
 - `uninstall.sh` asks before it changes anything. Skip the question with `--yes`.
+
+## Secret scanning
+
+The repo is public, so `install.sh core` enables a pre-commit hook (`.githooks/pre-commit`, through
+`git config core.hooksPath`) that runs `gitleaks` on staged changes and blocks the commit when it finds a key or
+token. The `apps` module installs gitleaks; without it the hook warns and lets the commit through. For a false
+positive, commit with `git commit --no-verify`.
 
 ## Troubleshooting
 
@@ -136,8 +166,11 @@ brew upgrade                    # packages; toolchains update through their own 
 |--------------------|-----------------------------------------------------------------------|
 | `install.sh`       | Installer entry point                                                 |
 | `uninstall.sh`     | Uninstaller entry point                                               |
+| `bootstrap.sh`     | One-line setup for a new Mac (Command Line Tools, clone, install)     |
+| `.githooks/`       | Pre-commit secret scan for this repo                                  |
 | `lib/`             | Installer internals: helpers, module definitions, menu                |
 | `Brewfile`         | Packages for `core`                                                   |
+| `Brewfile.apps`    | Packages for `apps`                                                   |
 | `Brewfile.desktop` | Packages for `desktop`                                                |
 | `zsh/`             | `~/.zshrc`, `~/.zshenv`, plus `path.zsh`                              |
 | `starship/`        | `~/.config/starship.toml`                                             |
@@ -161,6 +194,8 @@ brew upgrade                    # packages; toolchains update through their own 
 |---------------------|---------------------------------------------------|
 | `cd proj`           | Jump with zoxide; partial names work (`cdi` picks interactively) |
 | `fcd` · `fe`        | Pick a folder to enter · pick a file to edit      |
+| `bat` · `fd` · `rg` | Modern `cat` · `find` · `grep`, under their own names so pasted commands keep working |
+| `dust` · `duf` · `btop` | Modern `du` · `df` · `top`                    |
 | `Ctrl+T` · `Ctrl+R` · `Alt+C` | fzf: find file · search history · jump to folder |
 | `..` · `...`        | Up one · two folders                              |
 | `killport 3000` · `ports` | Free a port · list listening ports          |
