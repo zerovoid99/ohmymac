@@ -16,10 +16,16 @@
 	defaultBranch = main
 [pull]
 	rebase = true
-[url "git@github.com:"]
-	# use SSH for every GitHub URL, so https clones/remotes never ask for credentials
-	insteadOf = https://github.com/
+[url "https://github.com/"]
+	# gh:owner/repo shorthand
 	insteadOf = gh:
+[credential "https://github.com"]
+	# authenticate GitHub over HTTPS with the gh CLI login (no SSH keys needed)
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
 [push]
 	autoSetupRemote = true
 	default = current
